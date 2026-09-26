@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7B96EC"/>
+      <stop offset="55%" stop-color="#9E92F0"/>
+      <stop offset="100%" stop-color="#C79BEC"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#g)"/>
+  <!-- 细网格：数字世界 -->
+  <g stroke="#ffffff" stroke-width="1" opacity="0.07">
+    <line x1="200" y1="0" x2="200" y2="450"/>
+    <line x1="400" y1="0" x2="400" y2="450"/>
+    <line x1="600" y1="0" x2="600" y2="450"/>
+    <line x1="0" y1="112" x2="800" y2="112"/>
+    <line x1="0" y1="338" x2="800" y2="338"/>
+  </g>
+  <!-- 光斑 -->
+  <circle cx="690" cy="70" r="150" fill="#ffffff" opacity="0.10"/>
+  <circle cx="100" cy="390" r="120" fill="#ffffff" opacity="0.08"/>
+  <circle cx="760" cy="360" r="90" fill="#ffffff" opacity="0.08"/>
+  <!-- 二进制点缀 -->
+  <text x="86" y="84" font-family="monospace" font-size="22" fill="#ffffff" opacity="0.35">010110 10</text>
+  <text x="546" y="408" font-family="monospace" font-size="22" fill="#ffffff" opacity="0.30">1001 0110</text>
+  <!-- 盾牌 -->
+  <g transform="translate(400,225)">
+    <path d="M0,-92 L72,-62 L72,8 Q72,66 0,95 Q-72,66 -72,8 L-72,-62 Z"
+          fill="#ffffff" fill-opacity="0.13" stroke="#ffffff" stroke-width="5" stroke-opacity="0.9" stroke-linejoin="round"/>
+    <!-- 锁环 -->
+    <path d="M-16,-14 v-13 a16,16 0 0 1 32,0 v14" fill="none" stroke="#ffffff" stroke-width="8" stroke-opacity="0.95" stroke-linecap="round"/>
+    <!-- 锁体 -->
+    <rect x="-26" y="-14" width="52" height="42" rx="8" fill="#ffffff" opacity="0.95"/>
+    <!-- 锁孔 -->
+    <circle cx="0" cy="4" r="6.5" fill="#9E92F0"/>
+    <rect x="-2.6" y="6" width="5.2" height="13" rx="2.6" fill="#9E92F0"/>
+  </g>
+  <!-- 星点装饰 -->
+  <circle cx="240" cy="105" r="5" fill="#ffffff" opacity="0.5"/>
+  <circle cx="585" cy="320" r="4" fill="#ffffff" opacity="0.4"/>
+  <circle cx="150" cy="300" r="3" fill="#ffffff" opacity="0.35"/>
+  <text x="636" y="184" font-size="26" fill="#ffffff" opacity="0.5" font-family="sans-serif">✦</text>
+</svg>

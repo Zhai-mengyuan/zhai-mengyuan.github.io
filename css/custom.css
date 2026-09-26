@@ -1,0 +1,43 @@
+/* ============================================
+   圈圈的小站 - 自定义样式（淡蓝紫主题）
+   ============================================ */
+
+/* 全站顶部横幅：淡蓝紫渐变（替代图片大图） */
+#page-header {
+  background: linear-gradient(135deg, #8FB8F0 0%, #A99BF0 55%, #C9A0E8 100%) !important;
+  background-attachment: fixed;
+}
+
+/* 去掉顶部遮罩层，让渐变透亮 */
+#page-header:before {
+  background-color: transparent !important;
+}
+
+/* 顶部白色文字加深阴影，保证淡色背景上可读 */
+#site-info .site-title,
+#site-info .site-subtitle {
+  text-shadow: 0 2px 14px rgba(50, 40, 110, 0.55);
+}
+
+/* 文章页顶部标题阴影 */
+#page-header.post-bg .post-title,
+#page-header.post-bg #post-meta {
+  text-shadow: 0 2px 10px rgba(50, 40, 110, 0.4);
+}
+
+/* 文章卡片：hover 时淡蓝紫描边 + 轻浮起 */
+#recent-posts > .recent-post-item:hover {
+  border-color: #B8AAF4;
+  box-shadow: 0 8px 24px rgba(150, 130, 240, 0.25);
+}
+
+/* 导航栏滚动后的毛玻璃更透一点 */
+#nav {
+  backdrop-filter: blur(8px);
+}
+
+/* 侧边栏作者卡片：渐变描边感 */
+#aside-content .card-author {
+  border-top: 3px solid transparent;
+  border-image: linear-gradient(90deg, #8FB8F0, #C9A0E8) 1;
+}
