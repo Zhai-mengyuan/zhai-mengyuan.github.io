@@ -1,11 +1,30 @@
 /* ============================================
-   圈圈的小站 - 自定义样式（淡蓝紫主题）
+   圈圈的小站 - 自定义样式（淡蓝紫主题 · 动态版）
    ============================================ */
 
-/* 全站顶部横幅：淡蓝紫渐变（替代图片大图） */
+/* 全站顶部横幅：流动的淡蓝紫渐变 + 漂浮光斑 */
 #page-header {
-  background: linear-gradient(135deg, #8FB8F0 0%, #A99BF0 55%, #C9A0E8 100%) !important;
-  background-attachment: fixed;
+  background-image:
+    radial-gradient(circle 300px at 50% 50%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(circle 360px at 50% 50%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(135deg, #8FB8F0 0%, #A99BF0 30%, #C9A0E8 60%, #8FB8F0 100%) !important;
+  background-repeat: no-repeat;
+  background-size: 620px 620px, 760px 760px, 320% 320%;
+  animation: header-flow 18s ease-in-out infinite;
+}
+
+/* 三层背景各自缓慢移动：两层光斑漂移 + 底层渐变流动 */
+@keyframes header-flow {
+  0%   { background-position: 10% 14%, 86% 78%, 0% 50%; }
+  25%  { background-position: 20% 26%, 78% 66%, 25% 30%; }
+  50%  { background-position: 30% 44%, 70% 58%, 50% 50%; }
+  75%  { background-position: 18% 32%, 80% 70%, 75% 70%; }
+  100% { background-position: 10% 14%, 86% 78%, 0% 50%; }
+}
+
+/* 用户系统设置了减少动效时，保持静态 */
+@media (prefers-reduced-motion: reduce) {
+  #page-header { animation: none; }
 }
 
 /* 去掉顶部遮罩层，让渐变透亮 */
@@ -26,9 +45,13 @@
 }
 
 /* 文章卡片：hover 时淡蓝紫描边 + 轻浮起 */
+#recent-posts > .recent-post-item {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
 #recent-posts > .recent-post-item:hover {
   border-color: #B8AAF4;
   box-shadow: 0 8px 24px rgba(150, 130, 240, 0.25);
+  transform: translateY(-6px);
 }
 
 /* 导航栏滚动后的毛玻璃更透一点 */
