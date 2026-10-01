@@ -2,51 +2,74 @@
    圈圈的小站 - 自定义样式（淡蓝紫 · 高级感全套）
    ============================================ */
 
-/* ---------- 背景：极淡渐变，衬托毛玻璃卡片 ---------- */
+/* ---------- 背景：素净浅灰，衬托毛玻璃卡片 ---------- */
 body {
-  background: linear-gradient(160deg, #F6F4FF 0%, #F2F6FF 52%, #FAF2FB 100%) !important;
+  background: linear-gradient(180deg, #FBFBFD 0%, #F3F3F7 100%) !important;
   background-attachment: fixed;
 }
 [data-theme="dark"] body {
-  background: linear-gradient(160deg, #14141F 0%, #191925 52%, #1E1A28 100%) !important;
+  background: linear-gradient(180deg, #14141F 0%, #191925 100%) !important;
 }
 
-/* ---------- 顶部横幅：流动渐变 + 漂浮光斑 ---------- */
+/* ---------- 顶部横幅：深夜星空（低饱和深色 · 高级感） ---------- */
 #page-header {
   background-image:
-    radial-gradient(circle 300px at 50% 50%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 70%),
-    radial-gradient(circle 360px at 50% 50%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 70%),
-    linear-gradient(135deg, #8FB8F0 0%, #A99BF0 30%, #C9A0E8 60%, #8FB8F0 100%) !important;
+    radial-gradient(560px 380px at 78% 28%, rgba(124, 106, 224, 0.16), rgba(124, 106, 224, 0) 70%),
+    radial-gradient(480px 320px at 16% 76%, rgba(90, 70, 180, 0.14), rgba(90, 70, 180, 0) 70%),
+    linear-gradient(165deg, #0F1226 0%, #1D1A38 48%, #2C2144 100%) !important;
   background-repeat: no-repeat;
-  background-size: 620px 620px, 760px 760px, 320% 320%;
-  animation: header-flow 18s ease-in-out infinite;
+  background-size: 120% 120%, 120% 120%, 100% 100%;
+  animation: header-flow 26s ease-in-out infinite;
 }
 
+/* 光晕缓慢漂移 */
 @keyframes header-flow {
-  0%   { background-position: 10% 14%, 86% 78%, 0% 50%; }
-  25%  { background-position: 20% 26%, 78% 66%, 25% 30%; }
-  50%  { background-position: 30% 44%, 70% 58%, 50% 50%; }
-  75%  { background-position: 18% 32%, 80% 70%, 75% 70%; }
-  100% { background-position: 10% 14%, 86% 78%, 0% 50%; }
+  0%   { background-position: 78% 28%, 16% 76%, 0 0; }
+  50%  { background-position: 70% 36%, 24% 68%, 0 0; }
+  100% { background-position: 78% 28%, 16% 76%, 0 0; }
+}
+
+/* 星空层：细碎星点 + 缓慢闪烁（借遮罩伪元素） */
+#page-header:before {
+  background-color: transparent !important;
+  background-image:
+    radial-gradient(1.6px 1.6px at 12% 24%, rgba(255, 255, 255, 0.9) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 28% 62%, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1.8px 1.8px at 41% 18%, rgba(255, 255, 255, 0.75) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 48%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 66% 12%, rgba(255, 255, 255, 0.8) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 74% 55%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(2px 2px at 86% 34%, rgba(255, 255, 255, 0.85) 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 70%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 20% 84%, rgba(255, 255, 255, 0.65) 50%, transparent 51%),
+    radial-gradient(1px 1px at 60% 82%, rgba(255, 255, 255, 0.4) 50%, transparent 51%);
+  animation: twinkle 7s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   #page-header { animation: none; }
+  #page-header:before { animation: none; }
 }
 
-/* 去掉顶部遮罩层，让渐变透亮 */
-#page-header:before {
-  background-color: transparent !important;
+/* 顶部白色文字：细字重 + 大字距（高级感关键），视差由 JS 驱动 */
+#site-info .site-title {
+  font-weight: 300 !important;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 18px rgba(8, 8, 24, 0.6);
 }
-
-/* 顶部白色文字阴影（视差由 JS 驱动） */
-#site-info .site-title,
 #site-info .site-subtitle {
-  text-shadow: 0 2px 14px rgba(50, 40, 110, 0.55);
+  opacity: 0.78;
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 14px rgba(8, 8, 24, 0.55);
 }
 #page-header.post-bg .post-title,
 #page-header.post-bg #post-meta {
-  text-shadow: 0 2px 10px rgba(50, 40, 110, 0.4);
+  text-shadow: 0 2px 12px rgba(8, 8, 24, 0.5);
 }
 
 /* ---------- 顶部阅读进度条 ---------- */
@@ -56,10 +79,10 @@ body {
   left: 0;
   height: 3px;
   width: 0%;
-  background: linear-gradient(90deg, #8FB8F0, #C9A0E8);
+  background: linear-gradient(90deg, #5B4BC4, #9A6ED8);
   z-index: 99999;
   border-radius: 0 3px 3px 0;
-  box-shadow: 0 0 8px rgba(169, 155, 240, 0.6);
+  box-shadow: 0 0 8px rgba(122, 106, 224, 0.55);
 }
 
 /* ---------- 卡片：毛玻璃 + 阴影层级 + 圆角 ---------- */
