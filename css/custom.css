@@ -1,8 +1,17 @@
 /* ============================================
-   圈圈的小站 - 自定义样式（淡蓝紫主题 · 动态版）
+   圈圈的小站 - 自定义样式（淡蓝紫 · 高级感全套）
    ============================================ */
 
-/* 全站顶部横幅：流动的淡蓝紫渐变 + 漂浮光斑 */
+/* ---------- 背景：极淡渐变，衬托毛玻璃卡片 ---------- */
+body {
+  background: linear-gradient(160deg, #F6F4FF 0%, #F2F6FF 52%, #FAF2FB 100%) !important;
+  background-attachment: fixed;
+}
+[data-theme="dark"] body {
+  background: linear-gradient(160deg, #14141F 0%, #191925 52%, #1E1A28 100%) !important;
+}
+
+/* ---------- 顶部横幅：流动渐变 + 漂浮光斑 ---------- */
 #page-header {
   background-image:
     radial-gradient(circle 300px at 50% 50%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 70%),
@@ -13,7 +22,6 @@
   animation: header-flow 18s ease-in-out infinite;
 }
 
-/* 三层背景各自缓慢移动：两层光斑漂移 + 底层渐变流动 */
 @keyframes header-flow {
   0%   { background-position: 10% 14%, 86% 78%, 0% 50%; }
   25%  { background-position: 20% 26%, 78% 66%, 25% 30%; }
@@ -22,7 +30,6 @@
   100% { background-position: 10% 14%, 86% 78%, 0% 50%; }
 }
 
-/* 用户系统设置了减少动效时，保持静态 */
 @media (prefers-reduced-motion: reduce) {
   #page-header { animation: none; }
 }
@@ -32,35 +39,112 @@
   background-color: transparent !important;
 }
 
-/* 顶部白色文字加深阴影，保证淡色背景上可读 */
+/* 顶部白色文字阴影（视差由 JS 驱动） */
 #site-info .site-title,
 #site-info .site-subtitle {
   text-shadow: 0 2px 14px rgba(50, 40, 110, 0.55);
 }
-
-/* 文章页顶部标题阴影 */
 #page-header.post-bg .post-title,
 #page-header.post-bg #post-meta {
   text-shadow: 0 2px 10px rgba(50, 40, 110, 0.4);
 }
 
-/* 文章卡片：hover 时淡蓝紫描边 + 轻浮起 */
+/* ---------- 顶部阅读进度条 ---------- */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #8FB8F0, #C9A0E8);
+  z-index: 99999;
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(169, 155, 240, 0.6);
+}
+
+/* ---------- 卡片：毛玻璃 + 阴影层级 + 圆角 ---------- */
+.recent-post-item,
+.card-widget,
+#article-container {
+  background: rgba(255, 255, 255, 0.72) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(120, 100, 220, 0.06), 0 12px 32px rgba(120, 100, 220, 0.08);
+}
+[data-theme="dark"] .recent-post-item,
+[data-theme="dark"] .card-widget,
+[data-theme="dark"] #article-container {
+  background: rgba(28, 28, 36, 0.72) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.24);
+}
+
+/* 文章卡片：hover 描边 + 浮起 */
 #recent-posts > .recent-post-item {
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 #recent-posts > .recent-post-item:hover {
   border-color: #B8AAF4;
-  box-shadow: 0 8px 24px rgba(150, 130, 240, 0.25);
+  box-shadow: 0 10px 32px rgba(150, 130, 240, 0.28);
   transform: translateY(-6px);
 }
 
-/* 导航栏滚动后的毛玻璃更透一点 */
+/* ---------- 排版：衬线标题 + 舒朗行距 ---------- */
+#site-info .site-title,
+#page-header.post-bg .post-title,
+.recent-post-item .post-title,
+#article-container h1,
+#article-container h2,
+#article-container h3 {
+  font-family: Georgia, 'Times New Roman', 'Songti SC', STSong, SimSun, serif !important;
+}
+#article-container p,
+#article-container li {
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+}
+#article-container p {
+  margin-bottom: 1.1em;
+}
+
+/* 渐变标题文字（白底卡片区域） */
+.recent-post-item .post-title,
+#aside-content .card-author .author-info__name {
+  background: linear-gradient(120deg, #7A6EE8, #B48FE8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+
+/* ---------- 内容滚动渐入 ---------- */
+.fade-up-target {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.fade-up-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- 导航栏毛玻璃 ---------- */
 #nav {
   backdrop-filter: blur(8px);
 }
 
-/* 侧边栏作者卡片：渐变描边感 */
+/* ---------- 侧边栏作者卡片：渐变描边 ---------- */
 #aside-content .card-author {
   border-top: 3px solid transparent;
   border-image: linear-gradient(90deg, #8FB8F0, #C9A0E8) 1;
+}
+
+/* 减少动效偏好：渐入直接可见 */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up-target {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
