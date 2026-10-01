@@ -22,6 +22,15 @@
   var header = document.getElementById('page-header');
   var info = document.getElementById('site-info');
 
+  /* 2b. 流星：注入到横幅内，依靠 CSS 动画循环划过 */
+  if (header && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    ['meteor-1', 'meteor-2', 'meteor-3'].forEach(function (cls) {
+      var m = document.createElement('span');
+      m.className = 'meteor ' + cls;
+      header.appendChild(m);
+    });
+  }
+
   function updateParallax() {
     if (!header || !info) return;
     var y = window.scrollY || 0;
