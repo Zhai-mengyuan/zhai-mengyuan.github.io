@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://zhai-mengyuan.github.io/img/cover-wireshark.svg">
 <meta property="article:published_time" content="2026-10-17T05:00:00.000Z">
-<meta property="article:modified_time" content="2026-10-20T13:44:22.019Z">
+<meta property="article:modified_time" content="2026-10-20T15:28:57.898Z">
 <meta property="article:author" content="圈圈">
 <meta property="article:tag" content="网络渗透测试">
 <meta property="article:tag" content="Wireshark">
@@ -21,7 +21,7 @@
   "url": "https://zhai-mengyuan.github.io/2026/10/17/qq-traffic-analysis/",
   "image": "https://zhai-mengyuan.github.io/img/cover-wireshark.svg",
   "datePublished": "2026-10-17T05:00:00.000Z",
-  "dateModified": "2026-10-20T13:44:22.019Z",
+  "dateModified": "2026-10-20T15:28:57.898Z",
   "author": [
     {
       "@type": "Person",
@@ -204,7 +204,7 @@
   isHighlightShrink: false,
   isToc: true,
   pageType: 'post'
-}</script><link rel="stylesheet" href="/css/custom.css?v=20261017c"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/cover-wireshark.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">圈圈的小站</span></a><a class="nav-page-title" href="/"><span class="site-name">用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-17T05:00:00.000Z" title="发表于 2026-10-17 13:00:00">2026-10-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-20T13:44:22.019Z" title="更新于 2026-10-20 21:44:22">2026-10-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>课程要求分析自己日常使用的 QQ：它走 TCP 还是 UDP、流量是加密还是明文、能否从流量中还原传输的文件。</p>
+}</script><link rel="stylesheet" href="/css/custom.css?v=20261017c"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/cover-wireshark.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">圈圈的小站</span></a><a class="nav-page-title" href="/"><span class="site-name">用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-17T05:00:00.000Z" title="发表于 2026-10-17 13:00:00">2026-10-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-20T15:28:57.898Z" title="更新于 2026-10-20 23:28:57">2026-10-20</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>课程要求分析自己日常使用的 QQ：它走 TCP 还是 UDP、流量是加密还是明文、能否从流量中还原传输的文件。</p>
 <p>本文分三部分：先补齐分析所需的协议基础，再按实验步骤给出可复现的操作与预期结果，最后给一张自检表，用来判断自己跑出来的结果是否正确。</p>
 <h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><table>
 <thead>
@@ -1020,9 +1020,10 @@
 <p>再补一个旁证：对这份 pcap 执行 <code>--export-objects http,目录</code>，输出目录是空的——这份抓包里没有任何可还原的 HTTP 对象。注意这个「空」有前提：<strong>那次抓包里 QQ 没有走明文 HTTP 通道</strong>。一旦走了，结论就完全不同，见 8.4。</p>
 <h3 id="8-4-例外：httpconn-通道的图片是明文"><a href="#8-4-例外：httpconn-通道的图片是明文" class="headerlink" title="8.4 例外：httpconn 通道的图片是明文"></a>8.4 例外：httpconn 通道的图片是明文</h3><p>前面所有结论都建立在一个前提上——文件走的是 TLS。但 QQ 还有一条<strong>明文 HTTP 通道</strong>：当 TCP 直连不通、或走特定业务（比如发图）时，客户端会退回 <code>http://htdata3.qq.com/cgi-bin/httpconn?htcmd=...&amp;uin=...</code>，把文件直接塞进 POST body。</p>
 <p>抓一次「给文件传输助手发一张图片」，然后：</p>
+<p><img src="/img/qq-pic-stream.png" alt="实拍：过滤 `tcp.stream eq 34`，543 号帧就是那条 POST——请求行里 `uin=` 后面明晃晃挂着 QQ 号"></p>
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 看 HTTP 请求（URL 里带 uin）</span></span><br><span class="line">D:\Wireshark\tshark.exe <span class="literal">-r</span> pic.pcapng <span class="literal">-Y</span> <span class="string">&quot;http.request&quot;</span> <span class="literal">-T</span> fields <span class="literal">-e</span> frame.number <span class="literal">-e</span> http.host <span class="literal">-e</span> http.request.uri</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 导出对象：响应体就是原文件</span></span><br><span class="line">D:\Wireshark\tshark.exe <span class="literal">-r</span> pic.pcapng <span class="literal">--export-objects</span> http,.\objects</span><br></pre></td></tr></table></figure>
 
-<p><img src="/img/qq-pic-export.png" alt="实测：请求行里就带着 uin（已打码），导出对象列表里那个 158,920 字节的文件就是原图本体"></p>
+<p><img src="/img/qq-pic-objects.png" alt="实拍：Wireshark 的 HTTP 对象列表，158 kB 的 `httpconn?htcmd=0x6FF0087&amp;uin=...` 就是原图本体"></p>
 <p>导出目录里会得到一个约 <strong>158,920 字节</strong>的文件，名字形如 <code>httpconn%3fhtcmd=0x6FF0087&amp;uin=...</code>。<strong>直接双击打不开</strong>——因为前 1,365 字节是 QQ 的协议头：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">偏移 0x000: 28 00 00 05 4c 00 02 67 72      ← 长度 / 版本 / 命令</span><br><span class="line">偏移 0x008: 0a 2b 08 01 12 0a &quot;1234567890&quot;  ← protobuf：uin</span><br><span class="line">偏移 0x018: 1a 0c &quot;PicUp.DataUp&quot; 20 01 …    ← 命令名 PicUp.DataUp</span><br><span class="line">偏移 0x555: ff d8 ff e0 00 10 4a 46 49 46    ← JPEG 从这里开始（JFIF）</span><br></pre></td></tr></table></figure>
 
@@ -1033,6 +1034,35 @@
 <p>不想手抠的话，一条命令搞定：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">d = <span class="built_in">open</span>(path, <span class="string">&#x27;rb&#x27;</span>).read()</span><br><span class="line">i = d.find(<span class="string">b&#x27;\xff\xd8\xff&#x27;</span>)      <span class="comment"># JPEG 起始</span></span><br><span class="line">j = d.rfind(<span class="string">b&#x27;\xff\xd9&#x27;</span>) + <span class="number">2</span>     <span class="comment"># JPEG 结束（含）</span></span><br><span class="line"><span class="built_in">open</span>(<span class="string">&#x27;pic.jpg&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>).write(d[i:j])</span><br></pre></td></tr></table></figure>
 
+<p>脚本不想写也可以用 010 Editor 手动剥，三步：</p>
+<p><strong>① 跳到图片开头</strong>：<code>Ctrl + G</code> 跳转到偏移 <strong>1365</strong>（即 0x555），核对光标处显示 <code>FF D8 FF E0 00 10 4A 46 49 46</code>——<code>4A 46 49 46</code> 就是 ASCII 的 <code>JFIF</code>，看到它说明站对位置了。</p>
+<p><img src="/img/qq-pic-010.png" alt="实拍：010 Editor 跳转到 1365 (555h)，光标处正是 FF D8 FF ... JFIF——JPEG 的真身就从这里开始"></p>
+<p><strong>② 选中到图片结尾</strong>：菜单 编辑 → 选择 → 选择范围，起始地址填 <code>1365</code>、长度填 <code>157530</code>（&#x3D; 158,894 − 1,365 + 1，正好是图片的完整大小）。嫌对话框麻烦也可以手动点选：点一下 1365 处的 <code>FF</code>，<code>Ctrl + G</code> 跳到 158,894，按住 Shift 点一下结尾的 <code>FF D9</code>，状态栏显示选中 157,530 字节即对。</p>
+<p><strong>③ 只保存选中的部分</strong>：菜单 文件 → <strong>保存选区</strong>（Save Selection As），存成 <code>qq_pic.jpg</code>。<strong>千万不要 Ctrl+S</strong>——那会把整个 158,920 字节文件（带着 QQ 协议头）原地覆盖，图片就废了。保存完双击验证，能显示 1280 × 1707 的原图即成功。</p>
+<p><img src="/img/qq-pic-result.png" alt="实拍：剥壳后存成的 qq_pic.jpg 双击直接打开——从流量里完整还原出的原图（1280 × 1707）"></p>
+<blockquote>
+<p><strong>踩坑记录</strong>：选择范围对话框左下角有个进制开关（Hex &#x2F; Dec）。如果在 Hex 模式下填十进制的 <code>157530</code>，会被解析成 0x157530 ≈ 140 万字节，直接报「选择是以前文件的结尾」。两套数值对号入座：</p>
+<table>
+<thead>
+<tr>
+<th>对话框模式</th>
+<th>起始地址</th>
+<th>长度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>十进制（Dec）</td>
+<td>1365</td>
+<td>157530</td>
+</tr>
+<tr>
+<td>十六进制（Hex）</td>
+<td>0x555</td>
+<td>0x2675A</td>
+</tr>
+</tbody></table>
+<p>用「跳转 + Shift 点选」则完全不涉及进制换算，比填对话框稳。</p>
+</blockquote>
 <p><strong>这条实验把上一节的结论限定了范围</strong>：「QQ 传的文件不可还原」只在 TLS 通道成立。控制面与聊天内容确实加密，但图片一旦落到 httpconn 通道就是明文——URL 里带着 uin，body 里躺着能直接查看的 JPEG。</p>
 <hr>
 <h2 id="九、步骤-6：对照实验"><a href="#九、步骤-6：对照实验" class="headerlink" title="九、步骤 6：对照实验"></a>九、步骤 6：对照实验</h2><p>步骤 5 的 0 命中存在两种解释：QQ 加密，或检测方法有误。为排除后者，设一个对照组：用明文 HTTP 传输一张图片，再尝试从流量中还原。</p>
@@ -1228,7 +1258,7 @@
 <li><strong>HTTP 连接通道</strong>：QQ 在 TCP 直连失败或特定场景下回落到 HTTP，请求行形如 <code>GET /cgi-bin/httpconn?htcmd=0x6ff0082&amp;uin=1234567890 HTTP/1.1</code>（host 为 <code>htdata3.qq.com</code> 等）——uin 就写在 URL 参数里，完全明文；</li>
 <li><strong>私有协议的头部</strong>：443 端口上跑的并不都是 TLS，QQ 私有协议的报文头里，从固定偏移（本文观测为第 14 字节起）开始就是 uin 的 ASCII 十进制字符串，后接密文体。Wireshark 按 443 端口把它误标成 SSL，所以这些帧显示为 “Continuation Data”，内容却搜得到。</li>
 </ul>
-<p><img src="/img/qq-uin-filter.png" alt="实拍：在 Wireshark 里直接拿 QQ 号当过滤条件，命中的帧与字节内容都能看到（IP、MAC 与号码已打码）"></p>
+<p><img src="/img/qq-uin-filter.png?v=20261020" alt="实拍：在 Wireshark 里直接拿 QQ 号当过滤条件，命中的帧与字节内容都能看到"></p>
 <p>也就是说，加密保护的是<strong>聊天内容</strong>，不保护<strong>你是谁</strong>。这也解释了为什么第一份抓包（90 秒、QQ 空闲）里一帧都没命中——httpconn 通道不是每次都走，搜不到不代表不存在。</p>
 <p>若要把 pcap 交给别人（交作业、发帖），先用这条过滤器找出所有含 uin 的帧，导出前脱敏或只给过滤后的统计结果。</p>
 <p>发布前的处理：</p>
@@ -1236,7 +1266,7 @@
 <li>本机地址一律写作「本机」，同网段其他设备写作 <code>10.34.102.x</code>；</li>
 <li>不含 QQ 号、昵称、好友信息；</li>
 <li>腾讯服务器 IP 保留（公开信息，无隐私风险）；</li>
-<li>截图中的头像、昵称、IP 与号码均已打码（本文唯一附图就是处理后的结果）；</li>
+<li>本文截图中的 QQ 号、本机 IP 与 MAC 没有打码——一是因为号码在包里本来就是明文，打码反而遮住了实验的重点；二是这是自己的博客。<strong>如果你要把同样的截图交作业或发到别的平台，建议先打码再发</strong>；</li>
 <li><strong>pcap 里若含图片传输，先按 8.4 检查能不能还原——能还原就必须把这段流量剔除，或者干脆不交原始包。</strong></li>
 </ul>
 <p><strong>域名清单是本文最容易被忽略的一项，但还不是最严重的。</strong> 49 个域名里，云盘、浏览器、办公软件各自留痕，从域名能反推出这台机器装了什么、在用哪些服务，所以正文只列出与 QQ 相关的 13 个。比域名更要紧的是图片：一旦走 httpconn，原图就躺在包里，导出即可查看——<strong>交作业前务必确认 pcap 里没有别人发给你、或你发给别人的照片。</strong></p>
