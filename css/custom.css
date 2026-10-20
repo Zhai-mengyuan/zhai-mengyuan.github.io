@@ -210,6 +210,15 @@ body {
   transform: none;
 }
 
+/* 保险：任何脚本都不允许把整篇文章藏起来。
+   旧版脚本曾给 #article-container 整体加渐入目标，
+   长文可见比例永远达不到阈值，会导致全文隐形——这里直接强制可见。 */
+#article-container.fade-up-target,
+#post #article-container.fade-up-target {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 /* ---------- 导航栏毛玻璃 ---------- */
 #nav {
   backdrop-filter: blur(8px);

@@ -65,13 +65,32 @@
           io.unobserve(en.target);
         }
       });
-    }, { threshold: 0.08 });
+    }, { threshold: 0, rootMargin: '0px 0px -6% 0px' });
 
-    document.querySelectorAll(
-      '#recent-posts > .recent-post-item, #aside-content .card-widget, #pagination, #post #article-container'
-    ).forEach(function (el) {
+    var reveal = function (el) {
       el.classList.add('fade-up-target');
       io.observe(el);
-    });
+    };
+
+    /* 首页卡片 / 侧栏 / 分页：整块渐入 */
+    document.querySelectorAll(
+      '#recent-posts > .recent-post-item, #aside-content .card-widget, #pagination'
+    ).forEach(reveal);
+
+    /* 文章页：只给段落级小块加渐入。
+       注意：绝不能把 #article-container 整个套进去——长文高度上万像素，
+       可见比例永远达不到阈值，整篇文章会停在 opacity:0 变成一片空白。 */
+    document.querySelectorAll(
+      '#article-container > h2, #article-container > h3, #article-container > h4, ' +
+      '#article-container > p, #article-container > blockquote, #article-container > pre, ' +
+      '#article-container > ul, #article-container > ol'
+    ).forEach(reveal);
+
+    /* 兜底：2 秒后仍未触发的元素直接显示，宁可不动也不能看不见 */
+    setTimeout(function () {
+      document.querySelectorAll('.fade-up-target:not(.fade-up-in)').forEach(function (el) {
+        el.classList.add('fade-up-in');
+      });
+    }, 2000);
   }
 })();
