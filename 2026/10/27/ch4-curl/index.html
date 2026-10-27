@@ -1,0 +1,571 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>curl 上手实录：从一条 GET 到上传、下载与证书边界 | 圈圈的小站</title><meta name="author" content="圈圈"><meta name="copyright" content="圈圈"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="主动扫描第四章作业——用 curl 走完十步：版本确认、GET、只看响应头、-v 看完整交互、301 跳转、POST JSON、-F 上传、-o 下载与 -k 证书边界，附实拍截图、响应头逐项分析与六个坑。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="curl 上手实录：从一条 GET 到上传、下载与证书边界">
+<meta property="og:url" content="https://zhai-mengyuan.github.io/2026/10/27/ch4-curl/index.html">
+<meta property="og:site_name" content="圈圈的小站">
+<meta property="og:description" content="主动扫描第四章作业——用 curl 走完十步：版本确认、GET、只看响应头、-v 看完整交互、301 跳转、POST JSON、-F 上传、-o 下载与 -k 证书边界，附实拍截图、响应头逐项分析与六个坑。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhai-mengyuan.github.io/img/cover-curl.svg">
+<meta property="article:published_time" content="2026-10-27T09:50:00.000Z">
+<meta property="article:modified_time" content="2026-10-27T09:44:00.330Z">
+<meta property="article:author" content="圈圈">
+<meta property="article:tag" content="网络渗透测试">
+<meta property="article:tag" content="curl">
+<meta property="article:tag" content="HTTP">
+<meta property="article:tag" content="主动扫描">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhai-mengyuan.github.io/img/cover-curl.svg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "curl 上手实录：从一条 GET 到上传、下载与证书边界",
+  "url": "https://zhai-mengyuan.github.io/2026/10/27/ch4-curl/",
+  "image": "https://zhai-mengyuan.github.io/img/cover-curl.svg",
+  "datePublished": "2026-10-27T09:50:00.000Z",
+  "dateModified": "2026-10-27T09:44:00.330Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "圈圈",
+      "url": "https://zhai-mengyuan.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://zhai-mengyuan.github.io/2026/10/27/ch4-curl/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'curl 上手实录：从一条 GET 到上传、下载与证书边界',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css?v=20261017c"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url(/img/cover-curl.svg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">圈圈的小站</span></a><a class="nav-page-title" href="/"><span class="site-name">curl 上手实录：从一条 GET 到上传、下载与证书边界</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">curl 上手实录：从一条 GET 到上传、下载与证书边界</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-27T09:50:00.000Z" title="发表于 2026-10-27 17:50:00">2026-10-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-27T09:44:00.330Z" title="更新于 2026-10-27 17:44:00">2026-10-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%BD%91%E7%BB%9C%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">网络渗透测试</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%AF%BE%E7%A8%8B%E5%8D%9A%E5%AE%A2/">课程博客</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p><strong>本章作业要求</strong>（网络渗透测试 · 第四章：主动扫描）</p>
+<p><img src="/img/hw-ch4.png" alt="作业：curl 是一款功能强大的命令行工具，用于在客户端与服务器之间传输数据，支持 HTTP、HTTPS、FTP、SFTP 等 20 多种协议；任意使用 curl，截图记录发布 blog"></p>
+</blockquote>
+<p>第四章讲主动扫描——主机发现、端口扫描、系统与服务指纹、NMAP 与它的脚本。curl 不在这些工具之列，但它是同一件事的另一种做法：<strong>nmap 扫的是「哪个端口开着」，curl 问的是「开着的那个端口会说什么」</strong>。前者给你一张地图，后者让你站到门口敲一下门，听里面回话的口音。</p>
+<p>本文按十步走一遍，每一步都附实拍输出和一句「这一行说明了什么」，最后汇总六个坑和一条防守视角。</p>
+<p>全文区分两类陈述：<strong>实测</strong>（本文终端有直接输出）与<strong>推断</strong>（依据协议规范，文中标出）。</p>
+<h2 id="一、预备知识"><a href="#一、预备知识" class="headerlink" title="一、预备知识"></a>一、预备知识</h2><h3 id="1-1-HTTP-是一次「问答」"><a href="#1-1-HTTP-是一次「问答」" class="headerlink" title="1.1 HTTP 是一次「问答」"></a>1.1 HTTP 是一次「问答」</h3><p>浏览器访问网页，本质是发一段文本、收一段文本：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GET /index.html HTTP/1.1      ← 请求行：方法 + 路径 + 版本</span><br><span class="line">Host: example.com             ← 请求头：我要哪个站点</span><br><span class="line">User-Agent: curl/8.21.0       ← 请求头：我是谁</span><br><span class="line">Accept: */*                   ← 请求头：我能收什么</span><br><span class="line">                              ← 空行：头结束，后面是请求体</span><br></pre></td></tr></table></figure>
+
+<p>服务器回：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK               ← 状态行：版本 + 状态码 + 原因短语</span><br><span class="line">Server: bfe                   ← 响应头：我是谁（这一行常泄露指纹）</span><br><span class="line">Content-Type: text/html       ← 响应头：我给你的东西是什么类型</span><br><span class="line">Content-Length: 227           ← 响应头：有多长</span><br><span class="line">                              ← 空行</span><br><span class="line">&lt;!doctype html&gt;...            ← 响应体：真正的内容</span><br></pre></td></tr></table></figure>
+
+<p>curl 干的事就是把这两段文本原样打在你眼前——浏览器替你藏起来的东西，它全给你看。</p>
+<h3 id="1-2-常用参数：按用途分四组"><a href="#1-2-常用参数：按用途分四组" class="headerlink" title="1.2 常用参数：按用途分四组"></a>1.2 常用参数：按用途分四组</h3><table>
+<thead>
+<tr>
+<th>用途</th>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>看响应</td>
+<td><code>-I</code></td>
+<td>只要响应头（HEAD 请求），不下载正文</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-i</code></td>
+<td>响应头 + 正文一起输出</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-v</code></td>
+<td>详细模式，连 TCP&#x2F;TLS 握手和请求原文都打出来</td>
+</tr>
+<tr>
+<td>控流程</td>
+<td><code>-L</code></td>
+<td>跟随 301&#x2F;302 跳转（<strong>默认不跟</strong>）</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-k</code></td>
+<td>跳过证书校验（仅测试用）</td>
+</tr>
+<tr>
+<td></td>
+<td><code>--max-time N</code></td>
+<td>超时上限，防止卡死</td>
+</tr>
+<tr>
+<td>发数据</td>
+<td><code>-X POST</code></td>
+<td>指定请求方法</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-d</code></td>
+<td>请求体（默认表单，配合 <code>-H</code> 可发 JSON）</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-F</code></td>
+<td>multipart 上传，<code>file=@本地路径</code></td>
+</tr>
+<tr>
+<td>存结果</td>
+<td><code>-O</code></td>
+<td>用远端文件名保存</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-o 名字</code></td>
+<td>自己指定保存名</td>
+</tr>
+<tr>
+<td></td>
+<td><code>-w 模板</code></td>
+<td>按模板输出耗时等统计</td>
+</tr>
+</tbody></table>
+<h3 id="1-3-状态码：先认这几类"><a href="#1-3-状态码：先认这几类" class="headerlink" title="1.3 状态码：先认这几类"></a>1.3 状态码：先认这几类</h3><table>
+<thead>
+<tr>
+<th>段位</th>
+<th>含义</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2xx</td>
+<td>成功</td>
+<td>200 OK</td>
+</tr>
+<tr>
+<td>3xx</td>
+<td>重定向</td>
+<td>301 永久、302 临时</td>
+</tr>
+<tr>
+<td>4xx</td>
+<td>客户端错</td>
+<td>403 拒绝、404 不存在</td>
+</tr>
+<tr>
+<td>5xx</td>
+<td>服务端错</td>
+<td>500 内部错误、502 网关错误</td>
+</tr>
+</tbody></table>
+<p>主动扫描里，状态码本身就是情报：<code>403</code> 说明目录存在但不让看，<code>404</code> 说明没有，换成 <code>200</code> 就说明有东西。</p>
+<h2 id="二、实验环境"><a href="#二、实验环境" class="headerlink" title="二、实验环境"></a>二、实验环境</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>系统</td>
+<td>Windows 11，PowerShell 5.1（管理员窗口）</td>
+</tr>
+<tr>
+<td>工具</td>
+<td>curl 8.21.0（Windows 自带），libcurl 8.21.0</td>
+</tr>
+<tr>
+<td>TLS 后端</td>
+<td>Schannel（走 Windows 系统证书库）</td>
+</tr>
+<tr>
+<td>练习目录</td>
+<td><code>D:\curl-test</code></td>
+</tr>
+<tr>
+<td>测试目标</td>
+<td>example.com &#x2F; baidu.com &#x2F; httpbin.org &#x2F; badssl.com &#x2F; github.com（全部公开站点）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>全部实验只对公开站点发普通请求，不涉及任何未授权目标。文中截图里本机与出口地址已打码。</p>
+</blockquote>
+<h2 id="三、第一步：确认环境"><a href="#三、第一步：确认环境" class="headerlink" title="三、第一步：确认环境"></a>三、第一步：确认环境</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl.exe <span class="literal">--version</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-version.png" alt="curl 8.21.0：Schannel 负责 TLS，zlib 负责压缩，WinLDAP 支持 LDAP"></p>
+<p>输出信息比看上去多，逐项拆：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>curl 8.21.0 (Windows) libcurl/8.21.0</code></td>
+<td>命令行版本 + 底层库版本</td>
+</tr>
+<tr>
+<td><code>Schannel</code></td>
+<td>TLS 后端用 Windows 自带的 SChannel，<strong>证书校验走系统证书库</strong></td>
+</tr>
+<tr>
+<td><code>zlib/1.3.2</code></td>
+<td>支持压缩传输</td>
+</tr>
+<tr>
+<td><code>WinIDN</code></td>
+<td>支持国际化域名（中文域名）</td>
+</tr>
+<tr>
+<td><code>WinLDAP</code></td>
+<td>编进了 LDAP 协议支持</td>
+</tr>
+<tr>
+<td><code>Protocols:</code></td>
+<td>支持的 20 多种协议，http&#x2F;https&#x2F;ws&#x2F;wss&#x2F;ldap 都在</td>
+</tr>
+<tr>
+<td><code>Features:</code></td>
+<td>HSTS、HTTPS-proxy、SSPI、SPNEGO、Unicode 等能力清单</td>
+</tr>
+</tbody></table>
+<p><strong>为什么先看这一行</strong>：后面 <code>-k</code> 与证书报错的行为，都由 <code>Schannel</code> 这一项决定——它用的是系统证书库，所以自签名证书会被系统判为「不受信任」，与 curl 本身无关。</p>
+<h2 id="四、第二步：第一条-GET"><a href="#四、第二步：第一条-GET" class="headerlink" title="四、第二步：第一条 GET"></a>四、第二步：第一条 GET</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl.exe https://example.com</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-get-example.png" alt="GET 请求：终端直接吐出网页源码，一行到底"></p>
+<p>终端刷出一整行 HTML：<code>&lt;!doctype html&gt;&lt;html lang=en&gt;&lt;head&gt;&lt;meta charset=utf-8&gt;...&lt;title&gt;Example Domain&lt;/title&gt;...</code>。</p>
+<p>三个要点：</p>
+<ul>
+<li><strong>默认 GET</strong>，不需要写 <code>-X GET</code>；</li>
+<li>输出的是<strong>源码</strong>，不是渲染后的页面——浏览器做的排版、执行 JS，curl 一概不做；</li>
+<li>正文里那句 <code>This domain is for use in documentation examples without needing permission</code> 说明它是专门给文档举例用的保留域名，<strong>拿它练手不会打扰任何真实站点</strong>。</li>
+</ul>
+<h2 id="五、第三步：只看响应头"><a href="#五、第三步：只看响应头" class="headerlink" title="五、第三步：只看响应头"></a>五、第三步：只看响应头</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl.exe <span class="literal">-I</span> https://www.baidu.com</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-head-baidu.png" alt="HEAD 请求：只要头，不要正文，服务器指纹一览"></p>
+<p>输出只有头，没有正文。逐行读：</p>
+<table>
+<thead>
+<tr>
+<th>响应头</th>
+<th>实测值</th>
+<th>读出来的信息</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>状态行</td>
+<td><code>HTTP/1.1 200 OK</code></td>
+<td>走 HTTP&#x2F;1.1，正常</td>
+</tr>
+<tr>
+<td><code>Server</code></td>
+<td><code>bfe</code></td>
+<td>百度自研接入层（Baidu Front End）——<strong>这一行就是指纹</strong></td>
+</tr>
+<tr>
+<td><code>Content-Type</code></td>
+<td><code>text/html</code></td>
+<td>返回的是网页</td>
+</tr>
+<tr>
+<td><code>Content-Length</code></td>
+<td><code>0</code></td>
+<td>HEAD 只问头，正文按规范不返回</td>
+</tr>
+<tr>
+<td><code>Cache-Control</code></td>
+<td><code>private, no-cache, no-store, proxy-revalidate, no-transform</code></td>
+<td>全禁缓存，说明这条路径是动态生成的</td>
+</tr>
+<tr>
+<td><code>Pragma</code></td>
+<td><code>no-cache</code></td>
+<td>给老 HTTP&#x2F;1.0 代理看的同一意思</td>
+</tr>
+<tr>
+<td><code>Set-Cookie</code></td>
+<td><code>BAIDUID=...; Max-Age=31536000</code>、<code>BAIDUID_BFESS=...; Secure; SameSite=None</code></td>
+<td>下发一年期标识 Cookie，<code>Secure</code> 表示只走 HTTPS</td>
+</tr>
+</tbody></table>
+<p><strong>防守视角的一句话</strong>：<code>Server</code> 头把接入层软件名直接告诉了对方。生产环境常见做法是把它改成 <code>Server: nginx</code> 之外的无意义值，或由反向代理统一覆写——<strong>减少指纹，就是增加对方的摸索成本</strong>。</p>
+<h2 id="六、第四步：-v-看一个请求的完整生命周期"><a href="#六、第四步：-v-看一个请求的完整生命周期" class="headerlink" title="六、第四步：-v 看一个请求的完整生命周期"></a>六、第四步：-v 看一个请求的完整生命周期</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl.exe <span class="literal">-v</span> https://httpbin.org/get</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-verbose.png" alt="-v 模式：DNS → TCP → TLS → 请求 → 响应，全过程可见"></p>
+<p><code>-v</code> 输出的每一行前面有符号，含义固定：</p>
+<table>
+<thead>
+<tr>
+<th>前缀</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>*</code></td>
+<td>curl 自己的过程信息（连接、握手、耗时）</td>
+</tr>
+<tr>
+<td><code>&gt;</code></td>
+<td>我发出去的请求</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>服务器回来的响应</td>
+</tr>
+</tbody></table>
+<p>按时间顺序拆解这段输出：</p>
+<ol>
+<li><code>* Trying 52.44.60.253:443...</code> 与 <code>* Trying 3.211.106.232:443...</code> —— 一个域名解析出<strong>多个 A 记录</strong>，curl 依次尝试，第一个不通就换下一个（这也是排查「为什么连的是这个 IP」的依据）；</li>
+<li><code>* schannel: disabled automatic use of client certificate</code> —— 没有客户端证书可发，跳过（访问双向认证站点时这里会不同）；</li>
+<li><code>* ALPN: curl offers http/1.1</code> &#x2F; <code>* ALPN: server accepted http/1.1</code> —— ALPN 是 TLS 握手时协商「接下来用什么应用层协议」，这里两边只谈成 <code>http/1.1</code>，没升到 h2；</li>
+<li><code>* Established connection to httpbin.org (52.44.60.253 port 443) from *** port 18693</code> —— 连接建立，括号里是服务端，<code>from</code> 后面是本机出口地址与临时端口（已打码）；</li>
+<li><code>&gt; GET /get HTTP/1.1</code>、<code>&gt; Host: httpbin.org</code>、<code>&gt; User-Agent: curl/8.21.0</code>、<code>&gt; Accept: */*</code> —— <strong>请求原文</strong>，UA 明晃晃写着 curl；</li>
+<li><code>&lt; HTTP/1.1 200 OK</code> 之后是响应头：<code>Server: gunicorn/19.9.0</code>（Python 的 WSGI 服务器，又是一条指纹）、<code>Content-Type: application/json</code>、<code>Content-Length: 254</code>、<code>Access-Control-Allow-Origin: *</code>（开放 CORS）；</li>
+<li>最后 <code>* Connection #0 to host httpbin.org:443 left intact</code> —— 连接保留在连接池里，后续请求可复用（keep-alive）。</li>
+</ol>
+<p><strong>这一节的价值</strong>：以后任何「为什么请求失败」的问题，<code>-v</code> 都能定位到卡在哪一层——DNS？TCP？TLS？还是服务器回了 4xx。排错先分层，别一上来就猜。</p>
+<h2 id="七、第五步：301-与-L"><a href="#七、第五步：301-与-L" class="headerlink" title="七、第五步：301 与 -L"></a>七、第五步：301 与 -L</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl.exe <span class="literal">-I</span> http://github.com      <span class="comment"># 只发请求，不跟跳转</span></span><br><span class="line">curl.exe <span class="literal">-sIL</span> http://github.com    <span class="comment"># 跟随跳转，一路到底</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-redirect.png" alt="同一个地址：不加 -L 停在 301，加了 -L 才拿到 200"></p>
+<p>第一条输出很短：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 301 Moved Permanently</span><br><span class="line">Location: https://github.com/</span><br></pre></td></tr></table></figure>
+
+<p><code>301</code> 是「永久搬家」，<code>Location</code> 告诉你去哪。<strong>curl 默认停在这里</strong>，不会自动跟——这是新人最容易误判的地方：明明浏览器打开是 200，脚本里却是 301。</p>
+<p>第二条加了 <code>-L</code>，于是继续跟到 <code>https://github.com/</code>，拿到 <code>200 OK</code> 和一长串响应头。其中有几行值得注意：</p>
+<ul>
+<li><code>Strict-Transport-Security: max-age=31536000; includeSubdomains; preload</code> —— HSTS，告诉浏览器「以后这个域名只能走 HTTPS」；</li>
+<li>一大串 <code>*.githubusercontent.com</code> 出现在 <code>Content-Security-Policy</code> 里——CSP 白名单，说明这个站点允许从哪些域加载资源；</li>
+<li><code>Server</code> 段与普通站点不同（GitHub 前端用了自研&#x2F;定制接入），<code>X-GitHub-Request-Id</code> 之类用于排障追踪。</li>
+</ul>
+<p><strong>把这些头连起来看</strong>，就能大致判断一个站点的技术栈与安全策略——这正是 whatweb 这类指纹工具自动做的事，curl 只是让你手工看见原始证据。</p>
+<h2 id="八、第六步：POST-JSON"><a href="#八、第六步：POST-JSON" class="headerlink" title="八、第六步：POST JSON"></a>八、第六步：POST JSON</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl.exe <span class="literal">-X</span> POST <span class="literal">-H</span> <span class="string">&quot;Content-Type: application/json&quot;</span> <span class="literal">-d</span> <span class="string">&#x27;&#123;\&quot;name\&quot;:\&quot;quanquan\&quot;,\&quot;id\&quot;:123&#125;&#x27;</span> https://httpbin.org/post</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-post-json.png" alt="POST JSON：服务器把收到的 JSON 原样回显"></p>
+<p>三个参数各管一件事：</p>
+<ul>
+<li><code>-X POST</code>：方法改成 POST；</li>
+<li><code>-H &quot;Content-Type: application/json&quot;</code>：告诉服务器「body 是 JSON」，<strong>不加这行，服务器会按表单解析</strong>；</li>
+<li><code>-d &#39;...&#39;</code>：请求体。</li>
+</ul>
+<p>输出里能验证它真的收到了：<code>&quot;json&quot;: &#123;&quot;id&quot;: 123, &quot;name&quot;: &quot;quanquan&quot;&#125;</code>，<code>Content-Length: 28</code> —— 28 字节正好是那段 JSON 的长度。</p>
+<blockquote>
+<p>⚠️ PowerShell 里的引号是这一节最大的坑：外层用单引号，JSON 内部的双引号要转义成 <code>\&quot;</code>。写成 <code>&#39;&#123;&quot;name&quot;:&quot;x&quot;&#125;&#39;</code> 在 PowerShell 里会被拆成多个参数，报「意外的标记」。CMD 里则要写成 <code>&quot;&#123;\&quot;name\&quot;:\&quot;x\&quot;&#125;&quot;</code>，两套规则不一样。</p>
+</blockquote>
+<h2 id="九、第七步：-F-上传文件"><a href="#九、第七步：-F-上传文件" class="headerlink" title="九、第七步：-F 上传文件"></a>九、第七步：-F 上传文件</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> demo &gt; test.jpg</span><br><span class="line">curl.exe <span class="operator">-F</span> <span class="string">&quot;file=@test.jpg&quot;</span> https://httpbin.org/post</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-upload.png" alt="multipart 上传：httpbin 回显文件名、MIME 与内容"></p>
+<p>关键点：</p>
+<ul>
+<li><strong><code>@</code> 不能丢</strong>。<code>-F &quot;file=test.jpg&quot;</code> 传的是字符串 <code>test.jpg</code>，加 <code>@</code> 才是「读这个文件」；</li>
+<li><code>Content-Type: multipart/form-data; boundary=----CQx4HB3...</code> —— 表单上传靠 <code>boundary</code> 分隔各字段，这串随机字符由 curl 自动生成；</li>
+<li>回显里 <code>&quot;files&quot;: &#123;&quot;file&quot;: &quot;data:image/jpeg;base64,...&quot;&#125;</code> —— <strong>服务器认为这是一张 JPEG</strong>，因为文件名后缀是 <code>.jpg</code>。</li>
+</ul>
+<p>最后这点是个现成的安全结论：<code>echo demo</code> 写进去的明明是文本（PowerShell 的 <code>&gt;</code> 重定向按 UTF-16LE 存，所以内容只有十几个字节），<strong>但 MIME 类型照样被判定成 <code>image/jpeg</code><strong>——因为客户端只给了文件名，服务端按后缀猜。现实中这就是「扩展名伪造」：把 webshell 改名成 <code>.jpg</code> 上传，只靠后缀校验的接口会放行。</strong>服务端校验必须看内容（魔数）而不是看名字。</strong></p>
+<h2 id="十、第八步：下载与证书边界"><a href="#十、第八步：下载与证书边界" class="headerlink" title="十、第八步：下载与证书边界"></a>十、第八步：下载与证书边界</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl.exe <span class="literal">-o</span> baidu.html https://www.baidu.com    <span class="comment"># 指定文件名保存</span></span><br><span class="line">curl.exe <span class="literal">-k</span> https://self<span class="literal">-signed</span>.badssl.com      <span class="comment"># 跳过证书校验</span></span><br><span class="line">curl.exe <span class="literal">-I</span> https://self<span class="literal">-signed</span>.badssl.com      <span class="comment"># 不加 -k，直接失败</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/curl-download-k.png" alt="-o 保存文件；-k 能过自签名站点，不加 -k 则报 60"></p>
+<p>第一条会打一张进度表（<code>% Total</code>、<code>% Received</code>、<code>Average Speed</code> 等），跑完当前目录多出 <code>baidu.html</code>——<strong>用 curl 抓页面存档，就是一条命令的事</strong>。</p>
+<p>第二条和第三条是这个实验最有教学价值的一组对比：</p>
+<ul>
+<li>加 <code>-k</code>：<code>200 OK</code>，正常拿到页面；</li>
+<li>不加 <code>-k</code>：直接失败，</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl: (60) schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - 证书链是由不受信任的颁发机构颁发的。</span><br></pre></td></tr></table></figure>
+
+<p><code>60</code> 是 curl 的证书校验错误码，后半句由 Schannel（Windows 证书库）给出——<strong>这正是第三节 <code>--version</code> 里那个 <code>Schannel</code> 的落地表现</strong>。curl 没有自己判断证书合不合法，它把这件事交给了操作系统的证书信任链。</p>
+<p>所以 <code>-k</code> 的真实含义是「<strong>关掉整个校验</strong>」：不仅跳过「证书过期」「域名不匹配」，也跳过「这是不是中间人」。<strong>它只该出现在靶场、自签名内网测试里</strong>；在生产脚本里出现 <code>-k</code>，等于把 HTTPS 退化成 HTTP。</p>
+<h2 id="十一、防守视角：主动扫描留下的痕迹"><a href="#十一、防守视角：主动扫描留下的痕迹" class="headerlink" title="十一、防守视角：主动扫描留下的痕迹"></a>十一、防守视角：主动扫描留下的痕迹</h2><p>这一章是「主动扫描」，主动就意味着<strong>对方看得见</strong>。curl 的每个请求都会在服务端留下一条访问日志，里面至少包含：时间、来源 IP、路径、状态码、<code>User-Agent</code>、<code>Referer</code>。</p>
+<p>攻击者常利用两点：</p>
+<table>
+<thead>
+<tr>
+<th>手法</th>
+<th>原理</th>
+<th>防守对策</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>改 UA 伪装浏览器</td>
+<td><code>-A &quot;Mozilla/5.0&quot;</code> 一行就能改，服务端看到的 UA 完全可伪造</td>
+<td>别把 UA 当身份凭证；异常 UA 只作为风控信号之一</td>
+</tr>
+<tr>
+<td>扩展名伪造上传</td>
+<td>见第九节，MIME 由文件名推断</td>
+<td>按魔数校验 + 重命名 + 上传目录禁止执行</td>
+</tr>
+<tr>
+<td>绕过证书告警抓流量</td>
+<td>客户端加 <code>-k</code> 或安装恶意根证书</td>
+<td>终端做证书固定（pinning）、监控系统根证书变动</td>
+</tr>
+</tbody></table>
+<p>反过来，防守方也可以主动用 curl 做两件事：<strong>验证自己的响应头有没有多说话</strong>（比如 <code>Server</code>、<code>X-Powered-By</code> 是否暴露版本），以及<strong>验证证书链是否完整</strong>（不加 <code>-k</code> 能否成功）。</p>
+<h2 id="十二、命令速查"><a href="#十二、命令速查" class="headerlink" title="十二、命令速查"></a>十二、命令速查</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 环境</span></span><br><span class="line">curl.exe <span class="literal">--version</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 请求</span></span><br><span class="line">curl.exe https://example.com                 <span class="comment"># GET</span></span><br><span class="line">curl.exe <span class="literal">-I</span> https://example.com              <span class="comment"># 只要响应头</span></span><br><span class="line">curl.exe <span class="literal">-i</span> https://example.com              <span class="comment"># 头 + 正文</span></span><br><span class="line">curl.exe <span class="literal">-v</span> https://example.com              <span class="comment"># 详细过程</span></span><br><span class="line">curl.exe <span class="literal">-L</span> https://example.com              <span class="comment"># 跟随跳转</span></span><br><span class="line">curl.exe <span class="literal">-A</span> <span class="string">&quot;Mozilla/5.0&quot;</span> https://x           <span class="comment"># 改 UA</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 发送数据</span></span><br><span class="line">curl.exe <span class="literal">-X</span> POST <span class="literal">-H</span> <span class="string">&quot;Content-Type: application/json&quot;</span> <span class="literal">-d</span> <span class="string">&#x27;&#123;\&quot;k\&quot;:\&quot;v\&quot;&#125;&#x27;</span> https://x/api</span><br><span class="line">curl.exe <span class="operator">-F</span> <span class="string">&quot;file=@D:\curl-test\test.jpg&quot;</span> https://x/upload</span><br><span class="line">curl.exe <span class="literal">-H</span> <span class="string">&quot;Cookie: session=abc123&quot;</span> https://x</span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存与统计</span></span><br><span class="line">curl.exe <span class="literal">-o</span> out.html https://example.com</span><br><span class="line">curl.exe <span class="literal">-O</span> https://example.com/file.zip</span><br><span class="line">curl.exe <span class="literal">-w</span> <span class="string">&quot;DNS:%&#123;time_namelookup&#125; 连接:%&#123;time_connect&#125; TLS:%&#123;time_appconnect&#125; 总计:%&#123;time_total&#125;`n&quot;</span> <span class="literal">-o</span> NUL <span class="literal">-s</span> https://example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 证书与代理</span></span><br><span class="line">curl.exe <span class="literal">-k</span> https://self<span class="literal">-signed</span>.badssl.com</span><br><span class="line">curl.exe <span class="literal">-x</span> http://<span class="number">127.0</span>.<span class="number">0.1</span>:<span class="number">8080</span> https://x    <span class="comment"># 走 Burp 代理</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="十三、踩坑记录"><a href="#十三、踩坑记录" class="headerlink" title="十三、踩坑记录"></a>十三、踩坑记录</h2><p><strong>1. PowerShell 里的 <code>curl</code> 不是 curl。</strong> <code>curl</code> 是 <code>Invoke-WebRequest</code> 的别名，参数体系完全不同，<code>curl -I</code> 会报「找不到与参数名称 I 匹配的参数」。写全名 <code>curl.exe</code> 才是真的 curl。同类陷阱还有 <code>wget</code>、<code>ls</code>、<code>rm</code>。</p>
+<p><strong>2. 在系统目录里写文件会被拒。</strong> 管理员窗口默认开在 <code>C:\WINDOWS\System32</code>，<code>echo demo &gt; test.jpg</code> 直接报 <code>UnauthorizedAccessException</code>。先 <code>cd D:\curl-test</code> 再干活——<code>-o</code> 下载、<code>-F</code> 上传都受同一个影响。</p>
+<p><strong>3. JSON 的引号两套规则。</strong> PowerShell 用 <code>&#39;&#123;\&quot;k\&quot;:\&quot;v\&quot;&#125;&#39;</code>，CMD 用 <code>&quot;&#123;\&quot;k\&quot;:\&quot;v\&quot;&#125;&quot;</code>，写反了服务器收到的是被截断的字符串。</p>
+<p><strong>4. <code>-F</code> 漏掉 <code>@</code>。</strong> 上传变成传字符串，服务器端只会看到一个叫 <code>test.jpg</code> 的文本字段。</p>
+<p><strong>5. <code>curl: (56) schannel: server closed abruptly</code>。</strong> 偶发，先换目标验证工具本身正常（换 baidu 或 httpbin），再判断是目标链路问题——分层排查，别怀疑命令写错。</p>
+<p><strong>6. 把 <code>-k</code> 当万能药。</strong> 它跳过的是整条信任链，包括中间人检测。生产环境永远不要出现。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://zhai-mengyuan.github.io">圈圈</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://zhai-mengyuan.github.io/2026/10/27/ch4-curl/">https://zhai-mengyuan.github.io/2026/10/27/ch4-curl/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://zhai-mengyuan.github.io" target="_blank">圈圈的小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%BD%91%E7%BB%9C%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">网络渗透测试</a><a class="post-meta__tags" href="/tags/curl/">curl</a><a class="post-meta__tags" href="/tags/HTTP/">HTTP</a><a class="post-meta__tags" href="/tags/%E4%B8%BB%E5%8A%A8%E6%89%AB%E6%8F%8F/">主动扫描</a></div><div class="post-share"><div class="social-share" data-image="/img/cover-curl.svg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/10/24/ch3-passive-scanning/" title="被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集"><img class="cover" src="/img/cover-ch3.svg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集</div></div><div class="info-2"><div class="info-item-1">  本章作业要求（网络渗透测试 · 第三章）   作业有三项：找出与 ZoomEye 功能类似的搜索引擎；结合 ZoomEye 等做相关搜索并截图；演示子域名收集并发布到博客。其中 ZoomEye 部分在课件要求之外做了深入拓展（指纹检索、摄像头案例、工控系统专题），见第三节。图片元数据这一节是课堂范例的复现与延伸（笑脸 BMP 里还挖出了一段隐藏文本）。 全文区分两类陈述：实测（本文实验有直接输出）与推断（依据协议规范或常识，会标出）。 结论   作业项 结论 依据    ZoomEye 同类引擎 Shodan、Censys、FOFA、Quake、Hunter、BinaryEdge、Netlas、Criminal IP 各平台官网与公开资料   ZoomEye 相关搜索 三条 v2 语法查询分别命中千万级 &#x2F; 万级 &#x2F; 216 条（本校），截图见 3.2 本文 3.2 节实测   子域名收集 证书透明度 + DNS 字典两法合并，28 个（含主域），cas 与 www 被两种方法同时命中 本文第四节实测   图片元数据 冰激凌原图（1.9 MB 相机直出）E...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/10/24/ch3-passive-scanning/" title="被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集"><img class="cover" src="/img/cover-ch3.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-24</div><div class="info-item-2">被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集</div></div><div class="info-2"><div class="info-item-1">  本章作业要求（网络渗透测试 · 第三章）   作业有三项：找出与 ZoomEye 功能类似的搜索引擎；结合 ZoomEye 等做相关搜索并截图；演示子域名收集并发布到博客。其中 ZoomEye 部分在课件要求之外做了深入拓展（指纹检索、摄像头案例、工控系统专题），见第三节。图片元数据这一节是课堂范例的复现与延伸（笑脸 BMP 里还挖出了一段隐藏文本）。 全文区分两类陈述：实测（本文实验有直接输出）与推断（依据协议规范或常识，会标出）。 结论   作业项 结论 依据    ZoomEye 同类引擎 Shodan、Censys、FOFA、Quake、Hunter、BinaryEdge、Netlas、Criminal IP 各平台官网与公开资料   ZoomEye 相关搜索 三条 v2 语法查询分别命中千万级 &#x2F; 万级 &#x2F; 216 条（本校），截图见 3.2 本文 3.2 节实测   子域名收集 证书透明度 + DNS 字典两法合并，28 个（含主域），cas 与 www 被两种方法同时命中 本文第四节实测   图片元数据 冰激凌原图（1.9 MB 相机直出）E...</div></div></div></a><a class="pagination-related" href="/2026/10/17/qq-traffic-analysis/" title="用 Wireshark 分析 QQ 流量：TCP&#x2F;UDP、加密方式与文件还原实测"><img class="cover" src="/img/cover-wireshark.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-17</div><div class="info-item-2">用 Wireshark 分析 QQ 流量：TCP&#x2F;UDP、加密方式与文件还原实测</div></div><div class="info-2"><div class="info-item-1">  本章作业要求（网络渗透测试 · QQ 流量分析：PC-PC 端、PC-手机端）   本文回答三个问题：QQ 走 TCP 还是 UDP、流量是加密还是明文、能不能从流量里把传过的文件还原出来。答案是：以 TCP 为主（97.2%）、三层加密但明文留了破口、文件能不能拿到取决于走哪条通道——局域网直传（8082）和 httpconn 回落这两条路都是明文，剥掉几十到一千多字节的头就能拿到完整图片，本文两次实测都还原成功了。 三处需要重点看的地方：  第四节「实测一」：手机 → 电脑，探到 QQ 的局域网直传端口 8082，2509 KB 的 TCP 流里剥掉 80 字节 HTTP 头还原出整张照片； 第五节「实测二」：PC → 文件传输助手，httpconn 明文通道，剥掉 1,365 字节私有协议头还原出 1280×1707 的原图； 第九、十节（步骤 4、5）：为什么很多人照着范文抓不到东西——TLS 通道上 7 种特征码零命中，得先把加密边界搞清楚；  全文区分两种陈述：实测（本文实验有直接输出，附帧数或命令）与推断（依据协议规范或实现原理，文中会标出）。 一、实验环境  ...</div></div></div></a><a class="pagination-related" href="/2026/09/23/dengbao-2-0/" title="等保 2.0 到底在保护什么？——从 CIA 三要素到渗透测试视角"><img class="cover" src="/img/cover-dengbao.svg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-09-23</div><div class="info-item-2">等保 2.0 到底在保护什么？——从 CIA 三要素到渗透测试视角</div></div><div class="info-2"><div class="info-item-1"> 网络渗透测试课程第一次课后作业，也是这个博客的第一篇文章。开博客一半是课程要求，一半是我自己想找个地方把学的东西写成文字——光会做不等于会讲，写出来的过程就是把知识真正过一遍脑子。平时的输出过程很少导致一些知识很容易模糊忘记，不能光输入不输出啊。   本章作业要求   这篇文章只做第一问：我对等保 2.0 的理解——从 CIA 三要素这块地基讲起，理清等保 1.0 到 2.0 到底改了什么、五个等级分别管什么、渗透测试在等保里站在哪个位置。第二问（虚拟机与 Kali 配置）放在后续实验类文章里。 一、先补一块地基：CIA 三要素聊等保之前，得先弄明白”安全”到底在保护什么。信息安全领域最经典的模型叫 CIA 三要素（跟中央情报局没关系，是三个单词的首字母）：  机密性（Confidentiality）：只有被授权的人或程序，才能访问和查看数据。（保护数据内容不能泄露，加密是是实现机密性要求的常见手段） 完整性（Integrity）：数据保持正确、完整的状态，不能被未授权地修改——无论篡改是意外还是恶意。（常见的保证一致性的技术手段是数字签名） 可用性（Availability）...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">圈圈</div><div class="author-info-description">慢慢记录成长的小站主人</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">博客刚开张，欢迎常来玩~</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A2%84%E5%A4%87%E7%9F%A5%E8%AF%86"><span class="toc-text">一、预备知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-HTTP-%E6%98%AF%E4%B8%80%E6%AC%A1%E3%80%8C%E9%97%AE%E7%AD%94%E3%80%8D"><span class="toc-text">1.1 HTTP 是一次「问答」</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0%EF%BC%9A%E6%8C%89%E7%94%A8%E9%80%94%E5%88%86%E5%9B%9B%E7%BB%84"><span class="toc-text">1.2 常用参数：按用途分四组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-%E7%8A%B6%E6%80%81%E7%A0%81%EF%BC%9A%E5%85%88%E8%AE%A4%E8%BF%99%E5%87%A0%E7%B1%BB"><span class="toc-text">1.3 状态码：先认这几类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83"><span class="toc-text">二、实验环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E7%AC%AC%E4%B8%80%E6%AD%A5%EF%BC%9A%E7%A1%AE%E8%AE%A4%E7%8E%AF%E5%A2%83"><span class="toc-text">三、第一步：确认环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E7%AC%AC%E4%BA%8C%E6%AD%A5%EF%BC%9A%E7%AC%AC%E4%B8%80%E6%9D%A1-GET"><span class="toc-text">四、第二步：第一条 GET</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%AC%AC%E4%B8%89%E6%AD%A5%EF%BC%9A%E5%8F%AA%E7%9C%8B%E5%93%8D%E5%BA%94%E5%A4%B4"><span class="toc-text">五、第三步：只看响应头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%AC%AC%E5%9B%9B%E6%AD%A5%EF%BC%9A-v-%E7%9C%8B%E4%B8%80%E4%B8%AA%E8%AF%B7%E6%B1%82%E7%9A%84%E5%AE%8C%E6%95%B4%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-text">六、第四步：-v 看一个请求的完整生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E7%AC%AC%E4%BA%94%E6%AD%A5%EF%BC%9A301-%E4%B8%8E-L"><span class="toc-text">七、第五步：301 与 -L</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E7%AC%AC%E5%85%AD%E6%AD%A5%EF%BC%9APOST-JSON"><span class="toc-text">八、第六步：POST JSON</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E7%AC%AC%E4%B8%83%E6%AD%A5%EF%BC%9A-F-%E4%B8%8A%E4%BC%A0%E6%96%87%E4%BB%B6"><span class="toc-text">九、第七步：-F 上传文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81%E7%AC%AC%E5%85%AB%E6%AD%A5%EF%BC%9A%E4%B8%8B%E8%BD%BD%E4%B8%8E%E8%AF%81%E4%B9%A6%E8%BE%B9%E7%95%8C"><span class="toc-text">十、第八步：下载与证书边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E9%98%B2%E5%AE%88%E8%A7%86%E8%A7%92%EF%BC%9A%E4%B8%BB%E5%8A%A8%E6%89%AB%E6%8F%8F%E7%95%99%E4%B8%8B%E7%9A%84%E7%97%95%E8%BF%B9"><span class="toc-text">十一、防守视角：主动扫描留下的痕迹</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5"><span class="toc-text">十二、命令速查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-text">十三、踩坑记录</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/10/27/ch4-curl/" title="curl 上手实录：从一条 GET 到上传、下载与证书边界"><img src="/img/cover-curl.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="curl 上手实录：从一条 GET 到上传、下载与证书边界"/></a><div class="content"><a class="title" href="/2026/10/27/ch4-curl/" title="curl 上手实录：从一条 GET 到上传、下载与证书边界">curl 上手实录：从一条 GET 到上传、下载与证书边界</a><time datetime="2026-10-27T09:50:00.000Z" title="发表于 2026-10-27 17:50:00">2026-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/10/24/ch3-passive-scanning/" title="被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集"><img src="/img/cover-ch3.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集"/></a><div class="content"><a class="title" href="/2026/10/24/ch3-passive-scanning/" title="被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集">被动扫描作业实录：EXIF 元数据、ZoomEye 同类引擎与子域名收集</a><time datetime="2026-10-24T03:00:00.000Z" title="发表于 2026-10-24 11:00:00">2026-10-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/10/17/qq-traffic-analysis/" title="用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测"><img src="/img/cover-wireshark.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测"/></a><div class="content"><a class="title" href="/2026/10/17/qq-traffic-analysis/" title="用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测">用 Wireshark 分析 QQ 流量：TCP/UDP、加密方式与文件还原实测</a><time datetime="2026-10-17T05:00:00.000Z" title="发表于 2026-10-17 13:00:00">2026-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/23/dengbao-2-0/" title="等保 2.0 到底在保护什么？——从 CIA 三要素到渗透测试视角"><img src="/img/cover-dengbao.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="等保 2.0 到底在保护什么？——从 CIA 三要素到渗透测试视角"/></a><div class="content"><a class="title" href="/2026/09/23/dengbao-2-0/" title="等保 2.0 到底在保护什么？——从 CIA 三要素到渗透测试视角">等保 2.0 到底在保护什么？——从 CIA 三要素到渗透测试视角</a><time datetime="2026-09-23T15:15:00.000Z" title="发表于 2026-09-23 23:15:00">2026-09-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/09/22/hello-world/" title="你好，这是我的第一篇博客"><img src="/img/cover-hello.svg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="你好，这是我的第一篇博客"/></a><div class="content"><a class="title" href="/2026/09/22/hello-world/" title="你好，这是我的第一篇博客">你好，这是我的第一篇博客</a><time datetime="2026-09-22T15:00:00.000Z" title="发表于 2026-09-22 23:00:00">2026-09-22</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By 圈圈</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"></div><script src="/js/custom.js?v=20261017b"></script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
