@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F1226"/>
+      <stop offset="55%" stop-color="#1B1533"/>
+      <stop offset="100%" stop-color="#2C2144"/>
+    </linearGradient>
+    <linearGradient id="term" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0A0D1A"/>
+      <stop offset="100%" stop-color="#06070F"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6C5CE7" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#3A2148" stop-opacity="0.1"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#bg)"/>
+
+  <g fill="#ffffff">
+    <circle cx="60" cy="52" r="1.6" opacity="0.7"/>
+    <circle cx="138" cy="30" r="1.1" opacity="0.45"/>
+    <circle cx="221" cy="72" r="1.3" opacity="0.55"/>
+    <circle cx="305" cy="38" r="1" opacity="0.4"/>
+    <circle cx="392" cy="26" r="1.5" opacity="0.6"/>
+    <circle cx="470" cy="60" r="1.1" opacity="0.45"/>
+    <circle cx="556" cy="34" r="1.3" opacity="0.5"/>
+    <circle cx="648" cy="66" r="1.6" opacity="0.65"/>
+    <circle cx="726" cy="40" r="1" opacity="0.4"/>
+    <circle cx="770" cy="98" r="1.2" opacity="0.45"/>
+    <circle cx="42" cy="132" r="1" opacity="0.35"/>
+    <circle cx="758" cy="182" r="1.1" opacity="0.4"/>
+    <circle cx="96" cy="392" r="1.3" opacity="0.5"/>
+    <circle cx="690" cy="404" r="1.1" opacity="0.45"/>
+    <circle cx="612" cy="382" r="0.9" opacity="0.3"/>
+  </g>
+
+  <g filter="url(#soft)" opacity="0.35">
+    <ellipse cx="640" cy="90" rx="120" ry="60" fill="#6C5CE7"/>
+    <ellipse cx="160" cy="380" rx="140" ry="50" fill="#2C2144"/>
+  </g>
+
+  <rect x="96" y="96" width="608" height="236" rx="10" fill="url(#term)" stroke="#3D3358" stroke-width="1.2"/>
+  <rect x="96" y="96" width="608" height="30" rx="10" fill="#141830"/>
+  <rect x="96" y="116" width="608" height="10" fill="#141830"/>
+  <circle cx="116" cy="111" r="4" fill="#4A3B6B"/>
+  <circle cx="132" cy="111" r="4" fill="#3D3358"/>
+  <circle cx="148" cy="111" r="4" fill="#322A4A"/>
+
+  <g font-family="Consolas, 'Courier New', monospace" font-size="15">
+    <text x="120" y="158" fill="#7C8BA1">$ nmap -sV -Pn 192.168.96.1</text>
+    <text x="120" y="184" fill="#8FA6C4">8000/tcp <tspan fill="#5AD1A0">open</tspan>  http  Easy File Sharing</text>
+    <text x="120" y="214" fill="#7C8BA1">$ python3 39009.py 192.168.96.1 8000</text>
+    <text x="120" y="240" fill="#A9B6C9">Connecting to: 192.168.96.1:8000</text>
+    <text x="120" y="264" fill="#A9B6C9">Done...</text>
+    <text x="120" y="296" fill="#E86A8A">[!] 靶机没有任何反应</text>
+    <rect x="120" y="308" width="9" height="16" fill="#6C5CE7" opacity="0.85"/>
+  </g>
+
+  <rect x="96" y="352" width="608" height="2" fill="url(#bar)"/>
+
+  <text x="96" y="392" font-family="'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="19" fill="#E8E6F2" letter-spacing="1.5">Easy File Sharing 远程溢出</text>
+  <text x="96" y="418" font-family="'Microsoft YaHei', 'PingFang SC', sans-serif" font-size="12.5" fill="#8C86A8" letter-spacing="2.5">漏洞扫描 · 第五章实例课</text>
+
+  <text x="704" y="392" font-family="Consolas, monospace" font-size="38" fill="#3D3358" text-anchor="end">8000</text>
+</svg>
